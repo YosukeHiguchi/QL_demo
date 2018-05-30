@@ -7,7 +7,7 @@ function qlearning_step(ag_loc, env_draw, env, reward) {
     ALPHA = 0.1;
     GAMMA = 0.9;
 
-    var time_step = 10;
+    var time_step = 100;
 
 
     // initialize qvalue
