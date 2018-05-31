@@ -20,7 +20,7 @@ function qlearning_step(ag_loc, env_draw, env, reward) {
             // fill -Infinity if (i, j) has reward or block
             if (reward[i][j] == 0 && env[i + 1][j + 1] == 0) {
                 for (var k = 0; k < 4; k++) {
-                    qvalue[i * W + j][k] = (isMovable(env, {y: i + 1, x: j + 1}, k))? Math.random(): NINF;
+                    qvalue[i * W + j][k] = (isMovable(env, {y: i + 1, x: j + 1}, k))? 0.5: NINF;
                 }
             } else {
                 qvalue[i * W + j].fill(NINF);
