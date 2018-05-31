@@ -51,7 +51,7 @@ function qlearning_step(ag_loc, env_draw, env, reward) {
         // update
         if (r != 0) {
             qvalue[(s.y - 1) * W + s.x - 1][a] = qvalue[(s.y - 1) * W + s.x - 1][a] + ALPHA * (r - qvalue[(s.y - 1) * W + s.x - 1][a]);
-            env_draw[snext.y - 1][snext.x - 1] = (r == 1)? RP: RN;
+            env_draw[snext.y - 1][snext.x - 1] = (r == 5)? RP: RN;
 
             snext.x = ag_loc.x;
             snext.y = ag_loc.y;
