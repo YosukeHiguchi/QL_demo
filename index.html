@@ -10,27 +10,33 @@
     <script src="lib/js/bootstrap-slider.min.js" test="test/javascript"></script>
     <script src="script/global.js" test="test/javascript"></script>
     <script src="script/canvas.js" test="test/javascript"></script>
-    <script src="script/Q.js" test="test/javascript"></script>
-    <script src="script/Q_step.js" test="test/javascript"></script>
-    <script src="script/main.js" test="test/javascript"></script>
+    <script src="script/agent.js" test="test/javascript"></script>
+    <script src="script/environment.js" test="test/javascript"></script>
+    <script src="script/train.js" test="test/javascript"></script>
 
 </head>
 <body>
-
-    <div id="wrapper">
-        <canvas id="canvas" width="800px" height="600px"></canvas>
+    <div id="button-wrapper">
         <div class="row">
             <div class="col-xs-4">
+                <button id="btn-solve-step" type="button" class="btn btn-default btn-lg">
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="col-xs-4">
                 <button id="btn-solve" type="button" class="btn btn-default btn-lg">
-                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Solve
+                    <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="col-xs-4">
+                <button id="btn-reset" type="button" class="btn btn-default btn-lg">
+                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-6">
-                <button id="btn-solve-step" type="button" class="btn btn-default btn-lg">
-                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span> Solve by step
-                </button>
+            <div class="col-xs-4">
+                <input id="time_step" type="text" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>
             </div>
         </div>
     </div>

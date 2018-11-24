@@ -1,18 +1,21 @@
-#wrapper {
-    margin: auto;
-    width: 800px;
-    height: 800px;
-}
-
 #canvas {
-    width: 800px;
-    height: 600px;
-    margin: 20px 0px;
+    margin: auto;
+    display: block;
     border: 1px solid black;
-    position: relative;
     background: #FFFFFF;
 }
 
-.row {
+#button-wrapper {
+    margin: auto;
+    width: 300px;
+}
+
+#button-wrapper .btn {
+    height: 60px;
+    width: 80px;
+}
+
+#button-wrapper .row {
     margin: 10px 0;
+    text-align: center;
 }

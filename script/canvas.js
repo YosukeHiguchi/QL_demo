@@ -1,98 +1,179 @@
-globalFunc();
+globalConfig();
 
 $(document).ready(function() {
-    var canavas = document.getElementById("canvas");
-
-    if (canvas.getContext) {
-        ctx = canvas.getContext("2d");
-
-        ctx.font = "20px serif";
-
-        img_agent = new Image();
-        img_agent.src = "./img/agent.png";
-        img_heart = new Image();
-        img_heart.src = "./img/reward_plus.png";
-        img_skull = new Image();
-        img_skull.src = "./img/reward_minus.png";
-        img_block = new Image();
-        img_block.src = "./img/block.png";
-
-        $("#btn-solve").on("click", function() {
-            clearCanvas();
-            main(1);
-        });
-
-        $("#btn-solve-step").on("click", function() {
-            $("#btn-solve").prop("disabled", true);
-            $("#btn-solve-step").prop("disabled", true);
-
-            clearCanvas();
-            main(2);
-
-        });
+    // INITIALIZATION
+    gameConfig();
+    var width_px = block_px * object[0].length;
+    var height_px = block_px * object.length
+    var canvas = new MyCanvas(width_px, height_px, block_px);
+    var env = new Environment(object, reward);
+    var agent;
+    for (var i = 0; i < env.h; i++) {
+        for (var j = 0; j < env.w; j++) {
+            if (object[i][j] == AG) {
+                agent = new Agent(j, i);
+                break;
+            }
+        }
     }
+
+    setTimeout(function() {
+        canvas.drawObjects(agent.position, env.object);
+        canvas.drawQValue(agent.qvalue);
+    }, 10);
+
+    $('#btn-solve').on('click', function() {
+        canvas.trainingMode();
+        train(env, agent, canvas, 0);
+    });
+
+    $('#btn-solve-step').on('click', function() {
+        canvas.trainingMode();
+        train(env, agent, canvas, 1);
+    });
+
+    $('#btn-reset').on('click', function() {
+        location.reload();
+    });
+
+    $('#time_step').slider().on('slide', function(e) {
+        time_step = e.value;
+    });
 });
 
-function drawEnvironment(env) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawGrid(PANEL_SIZE);
+var MyCanvas = (function() {
+    var MyCanvas = function(width, height, grid_size) {
+        $('body').prepend($('<canvas id="canvas" width="' + width + 'px" height="' + height + 'px"></canvas>'));
+        var $canvas = document.getElementById('canvas');
 
-    for (var i = 0; i < H; i++) {
-        for (var j = 0; j < W; j++) {
-            switch (env[i][j]) {
-                case AG:
-                    ctx.drawImage(img_agent, j * PANEL_SIZE, i * PANEL_SIZE);
-                        break;
-                case RP:
-                    ctx.drawImage(img_heart, j * PANEL_SIZE, i * PANEL_SIZE);
-                    break;
-                case RN:
-                    ctx.drawImage(img_skull, j * PANEL_SIZE, i * PANEL_SIZE);
-                    break;
-                case BL:
-                    ctx.drawImage(img_block, j * PANEL_SIZE, i * PANEL_SIZE);
-                    break;
-                default:
+        var _ctx = $canvas.getContext('2d');
+        _ctx.font = (grid_size / 10) + 'px serif';
+        var _width = width;
+        var _height = height;
+        var _grid_size = grid_size;
+        var _image = {};
+
+        Object.keys(IMAGE).forEach(function(key) {
+            var tmp = new Image();
+            tmp.src = IMAGE[key];
+            _image[key] = tmp;
+        });
+
+        Object.defineProperties(this, {
+            ctx: {
+                get: function() {
+                    return _ctx;
+                }
+            },
+            width: {
+                get: function() {
+                    return _width;
+                }
+            },
+            height: {
+                get: function() {
+                    return _height;
+                }
+            },
+            grid_size: {
+                get: function() {
+                    return _grid_size;
+                }
+            },
+            image: {
+                get: function() {
+                    return _image;
+                },
+                set: function(name, image) {
+                    _image[name] = image;
+                }
             }
+        });
+    }
 
+    var p = MyCanvas.prototype;
+    p.drawLine = function(x1, y1, x2, y2) {
+        var self = this;
+
+        self.ctx.beginPath();
+        self.ctx.moveTo(x1, y1);
+        self.ctx.lineTo(x2, y2);
+        self.ctx.stroke();
+    }
+
+    p.drawGrid = function() {
+        var self = this;
+
+        size = self.grid_size;
+        for (var i = 0; i <= self.height / size; i++) {
+            self.drawLine(0, size * i, self.width, size * i);
+        }
+        for (var i = 0; i <= this.width / size; i++) {
+            self.drawLine(size * i, 0, size * i, self.height);
         }
     }
 
-}
+    p.drawNumber = function(x, y, num) {
+        var self = this;
 
-function drawQValue(qvalue) {
-    for (var i = 0; i < H; i++) {
-        for (var j = 0; j < W; j++) {
-            drawNumber(qvalue[i * W + j][0].toFixed(3), 200 * j + 2, 100 + 200 * i); // left
-            drawNumber(qvalue[i * W + j][1].toFixed(3), 145 + 200 * j, 100 + 200 * i); // right
-            drawNumber(qvalue[i * W + j][2].toFixed(3), 75 + 200 * j, 18 + 200 * i); //up
-            drawNumber(qvalue[i * W + j][3].toFixed(3), 75 + 200 * j, 198 + 200 * i); //down
+        if (num != null) {
+            self.ctx.fillText(num.toFixed(3), x, y);
         }
     }
-}
 
-function drawLine(x1, y1, x2, y2) {
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-}
+    p.drawImage = function(x, y, img_key) {
+        var self = this;
 
-function drawGrid(boxSize) {
-    for (var i = 0; i <= HPX / boxSize; i++) {
-        drawLine(0, boxSize * i, WPX, boxSize * i);
+        Object.keys(self.image).forEach(function(key) {
+            if (KEY_TO_NUM[key] == img_key) {
+                self.ctx.drawImage(self.image[key], 0, 0, 200, 200, x, y, self.grid_size, self.grid_size);
+            }
+        });
     }
-    for (var i = 0; i <= WPX / boxSize; i++) {
-        drawLine(boxSize * i, 0, boxSize * i, HPX);
-    }
-}
 
-function drawNumber(num, x, y) {
-    if (num != NINF) {
-        ctx.fillText(num, x, y);
-    }
-}
+    p.drawObjects = function(ag_pos, object) {
+        var self = this;
+        var scale = self.grid_size;
 
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+        self.clearCanvas();
+        self.drawGrid();
+        for (var i = 0; i < self.height / scale; i++) {
+            for (var j = 0; j < self.width / scale; j++) {
+                self.drawImage(j * scale, i * scale, object[i][j]);
+            }
+        }
+        self.drawImage(ag_pos.x * scale, ag_pos.y * scale, AG);
+    }
+
+    p.drawQValue = function(qvalue) {
+        var self = this;
+        var size = self.grid_size;
+        var gh = self.height / size;
+        var gw = self.width / size;
+
+        // MAGIC NUMBERS YAY!!!
+        // scaled based on grid_size=200px
+        for (var i = 0; i < gh; i++) {
+            for (var j = 0; j < gw; j++) {
+                self.drawNumber(size * j + 2, size / 2 + size * i, qvalue[i][j][0]); // left
+                self.drawNumber(0.725 * size + size * j, size / 2 + size * i, qvalue[i][j][1]); // right
+                self.drawNumber(0.375 * size + size * j, (size / 10 - size / 100) + size * i, qvalue[i][j][2]); //up
+                self.drawNumber(0.375 * size + size * j, (size - size / 100) + size * i, qvalue[i][j][3]); //down
+            }
+        }
+    }
+
+    p.clearCanvas = function() {
+        var self = this;
+
+        self.ctx.clearRect(0, 0, self.width, self.height);
+    }
+
+    p.trainingMode = function() {
+        $("#btn-solve").prop("disabled", true);
+        $("#btn-solve-step").prop("disabled", true);
+        $("#time_step").slider("disable");
+    }
+
+    return MyCanvas;
+})();

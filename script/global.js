@@ -1,22 +1,64 @@
-function globalFunc() {
-    ctx = undefined;
-
-    WPX = 800;
-    HPX = 600;
-    PANEL_SIZE = 200; // pixel
-
-    W = 4;
-    H = 3;
+function globalConfig() {
+    NINF = Number.NEGATIVE_INFINITY;
 
     AG = 1; // agent
-    RP = 101; // positive reward
-    RN = 102; // negative reward
+    RW = 101; // positive reward
+    PN = 102; // negative reward
     BL = 103; // block
 
-    img_agent = undefined;
-    img_heart = undefined;
-    img_skull = undefined;
-    img_block = undefined;
+    KEY_TO_NUM = {
+        'agent': AG,
+        'reward': RW,
+        'penalty': PN,
+        'block': BL
+    }
 
-    NINF = Number.NEGATIVE_INFINITY;
+    IMAGE = {
+        'agent': "./img/agent.png",
+        'reward': "./img/reward.png",
+        'penalty': "./img/penalty.png",
+        'block': "./img/block.png"
+    };
+}
+
+// edit here to change game settings
+function gameConfig() {
+    time_step = 100;
+    block_px = 200;
+
+    object = [
+        [  0,  0,  0,  0, PN, RW],
+        [  0, BL, BL,  0,  0,  0],
+        [  0, BL, BL, BL, BL,  0],
+        [ AG,  0,  0,  0,  0,  0],
+    ];
+
+    reward = [
+        [-0.1, -0.1, -0.1, -0.1, -1, 1],
+        [-0.1, -100, -100, -0.1, -0.1, -0.1],
+        [-0.1, -100, -100, -100, -100, -0.1],
+        [-0.1, -0.1, -0.1, -0.1, -0.1, -0.1]
+    ];
+
+    // width = 800;
+    // height = 600;
+    // block = 200;
+    //
+    // object = [
+    //     [ 0,  0,  0, RW],
+    //     [ 0, BL,  0, PN],
+    //     [AG,  0,  0,  0]
+    // ];
+
+    // reward = [
+    //     [0, 0, 0, 5],
+    //     [0, 0, 0, -5],
+    //     [0, 0, 0, 0]
+    // ];
+    //
+    // reward = [
+    //     [-0.5, -0.5, -0.5, 5],
+    //     [-0.5, -0.5, -0.5, -5],
+    //     [-0.5, -0.5, -0.5, -0.5]
+    // ];
 }
