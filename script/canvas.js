@@ -20,7 +20,7 @@ $(document).ready(function() {
     setTimeout(function() {
         canvas.drawObjects(agent.position, env.object);
         canvas.drawQValue(agent.qvalue);
-    }, 10);
+    }, 100);
 
     $('#btn-solve').on('click', function() {
         canvas.trainingMode();
