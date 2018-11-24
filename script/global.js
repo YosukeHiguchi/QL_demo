@@ -24,7 +24,7 @@ function globalConfig() {
 // edit here to change game settings
 function gameConfig() {
     time_step = 100;
-    block_px = 200;
+    block_px = 150;
 
     object = [
         [  0,  0,  0,  0, PN, RW],
